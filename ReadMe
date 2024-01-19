@@ -1,0 +1,4 @@
+ This code combines classical computer vision (face detection using Haar Cascade) with deep learning-based emotion recognition (using the DeepFace library) to provide a real-time emotion analysis experience from the live camera feed.
+ Libraries Used: 
+             o	Opencv Library
+             o	DeepFace Library
