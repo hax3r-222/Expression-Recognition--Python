@@ -1,0 +1,51 @@
+import cv2
+from deepface import DeepFace
+
+# Provide the correct path to haarcascade_frontalface_default.xml
+cascade_path = "C:/Users/DELL/AppData/Local/Packages/PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0/LocalCache/local-packages/Python311/site-packages/cv2/data/haarcascade_frontalface_default.xml"
+face_cascade = cv2.CascadeClassifier(cascade_path)
+
+# Check if the cascade classifier was loaded successfully
+if face_cascade.empty():
+    print("Error loading cascade classifier.")
+    exit()
+
+# Open a video capture object (0 represents the default camera)
+video_cap = cv2.VideoCapture(0)
+
+while True:
+    # Read a frame from the camera
+    ret, video_data = video_cap.read()
+
+    # Convert the frame to grayscale
+    col = cv2.cvtColor(video_data, cv2.COLOR_BGR2GRAY)
+
+    # Detect faces in the frame
+    faces = face_cascade.detectMultiScale(col,scaleFactor=1.1,minNeighbors=5,minSize=(30, 30),flags=cv2.CASCADE_SCALE_IMAGE)
+
+    # Draw rectangles around the detected faces
+    for (x, y, w, h) in faces:
+        cv2.rectangle(video_data, (x, y), (x+w, y+h), (0, 255, 0), 2)
+
+    # Analyze the face using DeepFace with enforce_detection=False
+    result = DeepFace.analyze(video_data, actions=['emotion'], enforce_detection=False)
+
+    # Check if the result is a list
+    if isinstance(result, list):
+        # Assuming the first element of the list contains the analysis results
+        result = result[0]
+
+    # Display the emotion label in a smaller font
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    cv2.putText(video_data, result['dominant_emotion'], (50, 50), font, 1, (0, 0, 255), 2, cv2.LINE_AA)
+
+    # Display the frame
+    cv2.imshow("live_Video", video_data)
+
+    # Break the loop if 'a' key is pressed
+    if cv2.waitKey(10) & 0xFF == ord("a"):
+        break
+
+# Release the video capture object and close the window
+video_cap.release()
+cv2.destroyAllWindows()
